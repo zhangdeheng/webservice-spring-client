@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:jaxws="http://cxf.apache.org/jaxws"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+        
+    <context:component-scan base-package="demo.ws"/>
+
+    <jaxws:client id="helloService" serviceClass="demo.ws.soap_spring_cxf.HelloService"
+                  address="http://localhost:8080/wsService/ws/soap/hello?wsdl">
+        <jaxws:outInterceptors>
+            <ref bean="wss4jOutInterceptor"/>
+        </jaxws:outInterceptors>
+    </jaxws:client>
+
+    <!--客户端发送请求拦截器-->
+    <bean id="wss4jOutInterceptor" class="org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor">
+        <constructor-arg>
+            <map>
+                <!--签名（使用自己的私钥）-->
+                <entry key="action" value="Signature Encrypt"/>
+                <entry key="user" value="ciecc"/>
+                <entry key="passwordCallbackClass" value="demo.ws.soap_spring_cxf.ClientPasswordCallback"/>
+                <entry key="signaturePropFile" value="client.properties"/>
+                <!-- 加密 -->
+                <entry key="encryptionPropFile" value="client.properties"/>
+            </map>
+        </constructor-arg>
+    </bean>
+</beans>  
